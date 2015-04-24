@@ -3,10 +3,12 @@
 
 /*
  * `fourget` is a command line utility used for downloading all of the
- * images from a thread on 4chan.org. 
+ * images from a thread on 4chan.org. The script with automatically
+ * create a directory based on the name of the thread, or store the
+ * files in a directory name given by the user.
  * 
  * author:  Dave Smith-Hayes
- * version: 0.1
+ * version: 0.2
  */
 
 //The first argument must always be the URI of the thread
@@ -14,6 +16,8 @@ if(isset($argv[1]))
     $uri = $argv[1];
 else
     die("No URI given.");
+
+$has_dir_arg = (isset($argv[2])) ? true : false;
 
 // set the cURL options
 $curl_opts = array(
@@ -28,6 +32,7 @@ $uri = explode("/", $uri);
 
 $board     = $uri[3];  // "mu"
 $thread_id = $uri[5];  // "48186754"
+$new_dir   = ($has_dir_arg) ? $argv[2] : $uri[6];  // "the-mu-wiki"
 
 $thread_uri  = "http://a.4cdn.org/" . $board;
 $thread_uri .= "/thread/" . $thread_id . ".json";
@@ -57,6 +62,11 @@ foreach($thread_json->posts as $post) {
     }
 }
 
+// create the new directory
+mkdir($new_dir)
+    or die("mkdir");
+
+
 // downloads and saves each image
 foreach($image_urls as $img) {
     $curl_opts[CURLOPT_URL] = $img;
@@ -68,7 +78,7 @@ foreach($image_urls as $img) {
     $image = curl_exec($ch)
         or die("curl: " . curl_error($ch));
     
-    $f = fopen($img[$last], "w+")
+    $f = fopen($new_dir . "/" . $img[$last], "w+")
         or die("fopen");
     
     if(fwrite($f, $image))
