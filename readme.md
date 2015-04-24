@@ -9,4 +9,10 @@ imageboard.
 
     fourget http://boards.4chan.org/g/thread/39894014/the-g-wiki
 
+Or
+
+    fourget https://boards.4chan.org/g/thread/39894014/the-g-wiki wiki
+
+The latter will create a new directory called `wiki`.
+
 *Note*: you must use a full URL.
